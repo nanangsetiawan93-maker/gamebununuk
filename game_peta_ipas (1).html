@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>PETA IPAS - Game Pemetaan Interaktif SMKN 2 Pacitan</title>
+    <style>
+        :root {
+            --forest-dark: #1b5e20;
+            --emerald-primary: #2e7d32;
+            --emerald-light: #4caf50;
+            --mint-light: #e8f5e9;
+            --mint-bg: #f1f8e9;
+            --slate-text: #1b2e1c;
+            --slate-muted: #4a634e;
+            --white: #ffffff;
+            --correct-bg: #d4edda;
+            --correct-border: #28a745;
+            --correct-text: #155724;
+            --wrong-bg: #f8d7da;
+            --wrong-border: #dc3545;
+            --wrong-text: #721c24;
+            --warning-gold: #f59e0b;
+            --radius-lg: 16px;
+            --radius-md: 10px;
+            --radius-sm: 6px;
+            --shadow-md: 0 8px 24px rgba(27, 94, 32, 0.15);
+            --shadow-sm: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--mint-bg);
+            color: var(--slate-text);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .app-card {
+            width: 100%;
+            max-width: 520px;
+            background: var(--white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-height: 94vh;
+            position: relative;
+            border: 1px solid #c8e6c9;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--forest-dark), var(--emerald-primary));
+            color: var(--white);
+            padding: 16px 14px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+        }
+
+        .header .subtitle {
+            font-size: 0.78rem;
+            color: #c8e6c9;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .badge-container {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .teacher-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            color: var(--white);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .screen {
+            display: none;
+            padding: 14px;
+            flex: 1;
+            flex-direction: column;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        .welcome-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            flex: 1;
+            gap: 12px;
+        }
+
+        .hero-icon {
+            width: 75px;
+            height: 75px;
+            background: var(--mint-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--emerald-light);
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.2);
+        }
+
+        .form-group {
+            width: 100%;
+            text-align: left;
+            margin-bottom: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--forest-dark);
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #a5d6a7;
+            border-radius: var(--radius-md);
+            font-size: 0.88rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--emerald-primary);
+            box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+        }
+
+        .validation-msg {
+            color: #d32f2f;
+            font-size: 0.75rem;
+            margin-top: 3px;
+            display: none;
+            font-weight: 600;
+        }
+
+        .info-card {
+            background: var(--mint-bg);
+            border: 1px solid #c8e6c9;
+            border-radius: var(--radius-md);
+            padding: 12px;
+            width: 100%;
+            text-align: left;
+            font-size: 0.8rem;
+            line-height: 1.45;
+        }
+
+        .info-card ul {
+            margin-left: 18px;
+            margin-top: 4px;
+        }
+
+        .info-card li {
+            margin-bottom: 3px;
+        }
+
+        .btn {
+            background: var(--emerald-primary);
+            color: var(--white);
+            border: none;
+            padding: 12px 18px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(46, 125, 50, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            background: #a5d6a7;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .btn-check {
+            background: var(--forest-dark);
+            margin-top: 6px;
+        }
+
+        .hud-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            background: var(--mint-light);
+            padding: 10px 12px;
+            border-radius: var(--radius-md);
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--forest-dark);
+            margin-bottom: 8px;
+            border: 1px solid #c8e6c9;
+        }
+
+        .hud-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hud-student-info {
+            font-size: 0.75rem;
+            color: var(--slate-muted);
+            font-weight: 600;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--emerald-primary);
+            width: 10%;
+            transition: width 0.3s ease;
+        }
+
+        .prompt-card {
+            background: var(--white);
+            border: 1px solid #e0e0e0;
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .level-tag {
+            background: var(--forest-dark);
+            color: var(--white);
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .prompt-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--forest-dark);
+            margin: 4px 0;
+        }
+
+        .prompt-instruction {
+            font-size: 0.82rem;
+            color: #111;
+            font-weight: 600;
+            background: #fff8e1;
+            border: 1px solid #ffe082;
+            padding: 8px;
+            border-radius: var(--radius-sm);
+            margin-top: 4px;
+            line-height: 1.35;
+        }
+
+        .map-board-wrapper {
+            position: relative;
+            width: 100%;
+            background: #e0f2fe;
+            border: 2px solid var(--emerald-primary);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 10px;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.08);
+            touch-action: manipulation;
+        }
+
+        .map-board-wrapper svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .map-zone {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            stroke-width: 1.5;
+            stroke: rgba(0,0,0,0.25);
+        }
+
+        .map-zone:hover {
+            filter: brightness(1.12);
+        }
+
+        .map-zone.selected-zone {
+            stroke: #2196f3 !important;
+            stroke-width: 3.5 !important;
+            stroke-dasharray: 4,4;
+        }
+
+        .map-zone.correct-zone-glow {
+            animation: pulseGreen 1.2s infinite alternate;
+            stroke: #2e7d32 !important;
+            stroke-width: 4 !important;
+        }
+
+        .map-zone.wrong-zone-glow {
+            stroke: #d32f2f !important;
+            stroke-width: 4 !important;
+            fill-opacity: 0.8;
+        }
+
+        @keyframes pulseGreen {
+            from { fill-opacity: 0.75; stroke: #2e7d32; }
+            to { fill-opacity: 0.95; stroke: #ffc107; }
+        }
+
+        .pin-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            margin-left: -15px;
+            margin-top: -30px;
+            pointer-events: none;
+            z-index: 10;
+            animation: dropPin 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes dropPin {
+            0% { transform: translateY(-30px) scale(0.3); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .feedback-box {
+            display: none;
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-box.correct {
+            background-color: var(--correct-bg);
+            border: 1.5px solid var(--correct-border);
+            color: var(--correct-text);
+        }
+
+        .feedback-box.wrong {
+            background-color: var(--wrong-bg);
+            border: 1.5px solid var(--wrong-border);
+            color: var(--wrong-text);
+        }
+
+        .feedback-status {
+            font-size: 0.88rem;
+            font-weight: 800;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theory-card {
+            display: none;
+            background: var(--white);
+            border: 1.5px solid var(--emerald-primary);
+            border-radius: var(--radius-md);
+            padding: 10px 12px;
+            margin-bottom: 10px;
+            animation: fadeIn 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .theory-header {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--forest-dark);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .theory-body {
+            font-size: 0.79rem;
+            color: var(--slate-text);
+            line-height: 1.42;
+        }
+
+        .result-box {
+            padding: 12px;
+            border-radius: var(--radius-md);
+            margin-bottom: 10px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .result-box.passed {
+            background: #e8f5e9;
+            border: 2px solid #2e7d32;
+            color: #1b5e20;
+        }
+
+        .result-box.failed {
+            background: #ffebee;
+            border: 2px solid #c62828;
+            color: #b71c1c;
+        }
+
+        .score-circle {
+            width: 95px;
+            height: 95px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--forest-dark), var(--emerald-primary));
+            color: var(--white);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            border: 3px solid var(--white);
+            box-shadow: var(--shadow-md);
+        }
+
+        .score-num {
+            font-size: 2.2rem;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        .accordion-section {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            padding-right: 2px;
+            max-height: 240px;
+        }
+
+        .accordion-item {
+            border: 1px solid #e0e0e0;
+            border-radius: var(--radius-md);
+            margin-bottom: 6px;
+            background: var(--white);
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 9px 11px;
+            background: var(--mint-bg);
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--forest-dark);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .accordion-body {
+            padding: 9px 11px;
+            font-size: 0.78rem;
+            line-height: 1.38;
+            display: none;
+            border-top: 1px solid #eee;
+            background: var(--white);
+        }
+
+        .accordion-item.open .accordion-body {
+            display: block;
+        }
+
+        .footer-badge {
+            text-align: center;
+            padding: 8px;
+            background: var(--mint-bg);
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--forest-dark);
+            border-top: 1px solid #c8e6c9;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-card">
+    <div class="header">
+        <h1>PETA IPAS INTERAKTIF</h1>
+        <div class="subtitle">Pemetaan Eksploratif, Timeline, & Analisis Koneksi</div>
+        <div class="badge-container">
+            <span class="teacher-badge">Dikembangkan oleh Guru IPAS SMKN 2 Pacitan</span>
+        </div>
+    </div>
+
+    <div id="welcomeScreen" class="screen active">
+        <div class="welcome-content">
+            <div class="hero-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1b5e20" stroke-width="2">
+                    <path d="M12 2a8 8 0 0 0-8 8c0 5.25 8 12 8 12s8-6.75 8-12a8 8 0 0 0-8-8z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+            </div>
+            
+            <h2 style="color: var(--forest-dark); font-size: 1.1rem; font-weight: 800;">Selamat Datang di PETA IPAS!</h2>
+            <p style="font-size: 0.8rem; color: var(--slate-muted); line-height: 1.4;">
+                Siapkan dirimu untuk menganalisis keterkaitan ruang, waktu (timeline), dan fenomena alam-sosial melalui papan peta interaktif.
+            </p>
+
+            <div style="width: 100%;">
+                <div class="form-group">
+                    <label for="inputStudentName">Nama Lengkap Siswa:</label>
+                    <input type="text" id="inputStudentName" class="form-input" placeholder="Masukkan nama Anda..." autocomplete="off">
+                    <div id="valName" class="validation-msg">⚠️ Harap isi nama lengkap Anda!</div>
+                </div>
+                <div class="form-group">
+                    <label for="inputStudentClass">Kelas / Jurusan:</label>
+                    <input type="text" id="inputStudentClass" class="form-input" placeholder="Contoh: X TKR 1, X AKL 2..." autocomplete="off">
+                    <div id="valClass" class="validation-msg">⚠️ Harap isi kelas/jurusan Anda!</div>
+                </div>
+            </div>
+
+            <div class="info-card">
+                <strong style="color: var(--forest-dark);">Panduan Permainan:</strong>
+                <ul>
+                    <li>Terdapat <strong>10 Level Analisis Spasial IPAS</strong>.</li>
+                    <li>Ketuk zona lokasi pada papan peta yang paling tepat.</li>
+                    <li>Jawaban benar di tiap level menghasilkan <strong>+10 Poin</strong> (Maksimal 100 Poin).</li>
+                    <li>Target kelulusan minimal: <strong>80 Poin</strong>.</li>
+                </ul>
+            </div>
+
+            <button class="btn" onclick="startRegistration()">
+                Mulai Permainan PETA
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+        </div>
+    </div>
+
+    <div id="gameScreen" class="screen">
+        <div class="hud-bar">
+            <div class="hud-top">
+                <span id="levelIndicator">Level 1 / 10</span>
+                <span>Skor: <span id="currentScore" style="color: var(--emerald-primary); font-size: 0.95rem;">0</span></span>
+            </div>
+            <div id="hudStudentDisplay" class="hud-student-info">Siswa: - | Kelas: -</div>
+        </div>
+
+        <div class="progress-container">
+            <div id="progressBar" class="progress-fill"></div>
+        </div>
+
+        <div class="prompt-card">
+            <span id="levelTag" class="level-tag">KATEGORI IPAS</span>
+            <div id="levelTitle" class="prompt-title">Judul Level</div>
+            <div id="promptInstruction" class="prompt-instruction">Petunjuk Soal...</div>
+        </div>
+
+        <div id="mapBoardWrapper" class="map-board-wrapper">
+            <div id="svgContainer"></div>
+            <div id="pinContainer"></div>
+        </div>
+
+        <button id="checkBtn" class="btn btn-check" onclick="checkAnswer()" disabled>
+            Kirim Jawaban
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+        </button>
+
+        <div id="feedbackBox" class="feedback-box">
+            <div id="feedbackStatus" class="feedback-status">Status Jawaban</div>
+            <div id="feedbackText" style="font-size: 0.8rem; line-height: 1.35;">Deskripsi...</div>
+        </div>
+
+        <div id="theoryCard" class="theory-card">
+            <div class="theory-header">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1b5e20" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                Ulasan Teori & Penjelasan IPAS:
+            </div>
+            <div id="theoryBody" class="theory-body">Penjelasan teori ilmiah...</div>
+        </div>
+
+        <button id="nextBtn" class="btn" style="display: none;" onclick="nextLevel()">
+            Lanjut ke Level Berikutnya
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </button>
+    </div>
+
+    <div id="resultScreen" class="screen">
+        <div id="resultHeaderBox" class="result-box">
+            <h3 id="resultGreeting" style="font-size: 1.1rem; font-weight: 800; margin-bottom: 6px;">Selamat!</h3>
+            <div class="score-circle">
+                <span id="finalScore" class="score-num">0</span>
+                <span style="font-size: 0.68rem; color: #c8e6c9;">/ 100 POIN</span>
+            </div>
+            <div id="resultBadge" style="font-size: 0.85rem; font-weight: 800; margin-bottom: 4px;">[STATUS KELULUSAN]</div>
+            <p id="resultMessage" style="font-size: 0.8rem; line-height: 1.4; margin-top: 6px;">Pesan evaluasi...</p>
+        </div>
+
+        <h4 style="font-size: 0.85rem; color: var(--forest-dark); margin-bottom: 6px; font-weight: 800;">Rangkuman Teori IPAS (10 Level):</h4>
+        
+        <div id="accordionContainer" class="accordion-section"></div>
+
+        <button class="btn" onclick="restartGame()" style="margin-top: 4px;">
+            Ulangi Permainan
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"/></svg>
+        </button>
+    </div>
+
+    <div class="footer-badge">
+        Dikembangkan oleh Guru IPAS SMKN 2 Pacitan
+    </div>
+</div>
+
+<script>
+let studentName = "";
+let studentClass = "";
+let currentLevelIndex = 0;
+let score = 0;
+let selectedZone = null;
+let isAnswerChecked = false;
+let userRecords = [];
+
+// 10 Interactive IPAS Map Levels
+const mapLevels = [
+    {
+        id: 1,
+        tag: "Jalur Rempah & Pelayaran",
+        title: "Level 1: Pelabuhan Kuno Selat Malaka",
+        instruction: "📍 Ketuk zona Selat Malaka yang strategis sebagai tempat transit kapal niaga rempah-rempah kuno!",
+        targetZone: "selat_malaka",
+        targetName: "Zona Selat Malaka (Chokepoint)",
+        theory: "Selat Malaka merupakan titik penyempitan (chokepoint) pelayaran paling strategis abad ke-15. Posisinya terlindung angin muson dan menghubungkan Jalur Rempah antara Asia Timur, India, dan Eropa.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <rect width="400" height="240" fill="#0288d1"/>
+                <path class="map-zone" data-zone="daratan_sumatra" d="M 0,100 L 220,240 L 0,240 Z" fill="#388e3c"/>
+                <text x="60" y="210" font-size="11" fill="#fff" font-weight="bold">Daratan Sumatra</text>
+                <path class="map-zone" data-zone="semenanjung_malaya" d="M 120,0 L 400,0 L 400,120 Z" fill="#2e7d32"/>
+                <text x="280" y="45" font-size="11" fill="#fff" font-weight="bold">Semenanjung Malaya</text>
+                <path class="map-zone" data-zone="selat_malaka" d="M 60,70 L 280,160 L 220,200 L 0,90 Z" fill="#80deea" stroke="#00acc1" stroke-width="2"/>
+                <text x="160" y="125" font-size="11" fill="#006064" font-weight="bold" transform="rotate(25,160,125)">SELAT MALAKA (PELABUHAN KUNO)</text>
+            </svg>`
+    },
+    {
+        id: 2,
+        tag: "Vulkanisme & Kesuburan Tanah",
+        title: "Level 2: Kesuburan Lereng Gunung Api",
+        instruction: "📍 Ketuk zona Lereng Vulkanik yang kaya akan pelapukan abu vulkanik menjadi tanah andosol subur!",
+        targetZone: "lereng_vulkanik",
+        targetName: "Lereng Vulkanik (Tanah Andosol)",
+        theory: "Erupsi gunung api mengeluarkan abu vulkanis kaya mineral hara. Setelah mengalami pelapukan, lereng gunung berkembang menjadi Tanah Andosol yang sangat subur untuk pertanian.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <rect width="400" height="240" fill="#e8f5e9"/>
+                <path class="map-zone" data-zone="kawah_aktif" d="M 160,70 L 200,30 L 240,70 Z" fill="#d32f2f"/>
+                <text x="200" y="52" font-size="9" fill="#fff" font-weight="bold" text-anchor="middle">KAWAH AKTIF</text>
+                <path class="map-zone" data-zone="lereng_vulkanik" d="M 40,170 L 160,70 L 240,70 L 360,170 Z" fill="#795548" stroke="#3e2723" stroke-width="2"/>
+                <text x="200" y="125" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">LERENG VULKANIK (TANAH ANDOSOL)</text>
+                <path class="map-zone" data-zone="dataran_jauh" d="M 0,170 L 400,170 L 400,240 L 0,240 Z" fill="#a5d6a7"/>
+                <text x="200" y="210" font-size="10" fill="#1b5e20" font-weight="bold" text-anchor="middle">Dataran Aluvial Jauh</text>
+            </svg>`
+    },
+    {
+        id: 3,
+        tag: "Teori Lokasi Industri",
+        title: "Level 3: Klaster Industri Peri-Urban",
+        instruction: "📍 Ketuk Koridor Peri-Urban Cikarang/Karawang yang terhubung langsung ke jalan tol & pelabuhan!",
+        targetZone: "koridor_periurban",
+        targetName: "Koridor Peri-Urban (Akses Tol/Pelabuhan)",
+        theory: "Teori Alfred Weber menyatakan bahwa lokasi industri memilih titik dengan biaya transportasi terendah. Koridor peri-urban dengan akses tol dan pelabuhan memberikan efisiensi logistik tinggi.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <rect width="400" height="240" fill="#eceff1"/>
+                <path class="map-zone" data-zone="hutan_pegunungan" d="M 0,0 L 400,0 L 400,70 L 0,70 Z" fill="#2e7d32"/>
+                <text x="200" y="40" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Hutan Pegunungan Konservasi</text>
+                <path class="map-zone" data-zone="koridor_periurban" d="M 0,70 L 400,70 L 400,160 L 0,160 Z" fill="#90a4ae" stroke="#37474f" stroke-width="2"/>
+                <text x="200" y="105" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">KORIDOR PERI-URBAN (KLASTER INDUSTRI)</text>
+                <line x1="0" y1="125" x2="400" y2="125" stroke="#ffc107" stroke-width="6" stroke-dasharray="10,5"/>
+                <path class="map-zone" data-zone="pelabuhan_ekspor" d="M 0,160 L 400,160 L 400,240 L 0,240 Z" fill="#0288d1"/>
+                <text x="200" y="205" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Pelabuhan Laut Ekspor-Impor</text>
+            </svg>`
+    },
+    {
+        id: 4,
+        tag: "Mitigasi Bencana Tektonik",
+        title: "Level 4: Evakuasi Tsunami Pesisir Barat",
+        instruction: "📍 Ketuk Bukit Evakuasi Tinggi di pesisir barat Sumatra yang aman dari gelombang tsunami!",
+        targetZone: "bukit_evakuasi",
+        targetName: "Bukit Dataran Tinggi Evakuasi",
+        theory: "Zona subduksi lempeng aktif di pesisir barat Sumatra memicu gempa dangkal dan tsunami. Mitigasi bencana membutuhkan penataan ruang dengan Tempat Evakuasi Sementara (TES) di perbukitan tinggi.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <path class="map-zone" data-zone="laut_subduksi" d="M 0,150 L 400,150 L 400,240 L 0,240 Z" fill="#01579b"/>
+                <text x="200" y="200" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">LAUT ZONA SUBDUKSI (TSUNAMI)</text>
+                <path class="map-zone" data-zone="pesisir_merah" d="M 0,90 L 400,90 L 400,150 L 0,150 Z" fill="#ef5350"/>
+                <text x="200" y="122" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">Zona Merah Bahaya Hempasan Pantai</text>
+                <path class="map-zone" data-zone="bukit_evakuasi" d="M 0,0 L 400,0 L 400,90 L 0,90 Z" fill="#388e3c" stroke="#1b5e20" stroke-width="2"/>
+                <text x="200" y="50" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">BUKIT DATARAN TINGGI (TES EVAKUASI AMAN)</text>
+            </svg>`
+    },
+    {
+        id: 5,
+        tag: "Tata Ruang & Alih Fungsi Lahan",
+        title: "Level 5: Alih Fungsi Lahan Peri-Urban",
+        instruction: "📍 Ketuk Zona Peri-Urban (batas kota-desa) yang mengalami konversi sawah menjadi perumahan!",
+        targetZone: "zona_periurban",
+        targetName: "Zona Peri-Urban Transisi",
+        theory: "Teori Sewa Tanah (Bid Rent) menjelaskan bahwa zona peri-urban memiliki harga tanah lebih murah dari pusat kota namun aksesibilitasnya baik, memicu masifnya alih fungsi lahan pertanian.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <path class="map-zone" data-zone="pusat_kota" d="M 0,0 L 130,0 L 130,240 L 0,240 Z" fill="#546e7a"/>
+                <text x="65" y="125" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">Pusat Kota Padat</text>
+                <path class="map-zone" data-zone="zona_periurban" d="M 130,0 L 270,0 L 270,240 L 130,240 Z" fill="#ffb74d" stroke="#e65100" stroke-width="2"/>
+                <text x="200" y="125" font-size="11" fill="#bf360c" font-weight="bold" text-anchor="middle">ZONA PERI-URBAN (TRANSISI)</text>
+                <path class="map-zone" data-zone="pedesaan_sawah" d="M 270,0 L 400,0 L 400,240 L 270,240 Z" fill="#81c784"/>
+                <text x="335" y="125" font-size="10" fill="#1b5e20" font-weight="bold" text-anchor="middle">Pedesaan Sawah</text>
+            </svg>`
+    },
+    {
+        id: 6,
+        tag: "Klimatologi & Ketahanan Pangan",
+        title: "Level 6: Dampak El Niño pada Pangan Regional",
+        instruction: "📍 Ketuk kawasan Sabana Monsunal Kering Nusa Tenggara yang paling terdampak kekeringan El Niño!",
+        targetZone: "sabana_nusa_tenggara",
+        targetName: "Sabana Monsunal Kering Nusa Tenggara",
+        theory: "El Niño memperpanjang durasi angin muson timur yang kering. Wilayah Nusa Tenggara beriklim monsunal kering dengan cadangan air terbatas mengalami ancaman krisis pangan terparah.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <rect width="400" height="240" fill="#e0f7fa"/>
+                <path class="map-zone" data-zone="sumatra_basah" d="M 10,20 Q 120,40 160,110 L 10,110 Z" fill="#4caf50"/>
+                <text x="80" y="70" font-size="10" fill="#fff" font-weight="bold">Sumatra (Basah)</text>
+                <path class="map-zone" data-zone="kalimantan_hujan" d="M 130,10 Q 230,20 200,90 L 130,50 Z" fill="#2e7d32"/>
+                <text x="160" y="45" font-size="10" fill="#fff" font-weight="bold">Kalimantan</text>
+                <path class="map-zone" data-zone="sabana_nusa_tenggara" d="M 200,130 L 390,130 L 380,220 L 190,220 Z" fill="#bcaaa4" stroke="#bf360c" stroke-width="2"/>
+                <text x="285" y="175" font-size="11" fill="#3e2723" font-weight="bold" text-anchor="middle">SABANA NUSA TENGGARA (EL NIÑO)</text>
+            </svg>`
+    },
+    {
+        id: 7,
+        tag: "Ekologi & Pencemaran Sungai",
+        title: "Level 7: Pencemaran DAS Citarum",
+        instruction: "📍 Ketuk zona DAS Tengah (wilayah industri) yang melebihi daya dukung pencemaran air sungai!",
+        targetZone: "das_tengah_industri",
+        targetName: "DAS Tengah (Zona Konsentrasi Pabrik)",
+        theory: "Prinsip ekologi menyatakan bahwa sungai memiliki batas kapasitas asimilasi. Pembuangan limbah industri di DAS tengah tanpa IPAL merusak daya dukung ekosistem air secara permanen.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <rect width="400" height="240" fill="#f1f8e9"/>
+                <path d="M 20,20 Q 150,50 200,120 T 380,220" fill="none" stroke="#0288d1" stroke-width="16"/>
+                <circle class="map-zone" data-zone="hulu_bersih" cx="40" cy="30" r="30" fill="#66bb6a"/>
+                <text x="40" y="33" font-size="9" fill="#fff" font-weight="bold" text-anchor="middle">Hulu Bersih</text>
+                <rect class="map-zone" data-zone="das_tengah_industri" x="140" y="80" width="110" height="55" fill="#ff7043" stroke="#d84315" stroke-width="2"/>
+                <text x="195" y="110" font-size="10" fill="#fff" font-weight="bold" text-anchor="middle">DAS TENGAH INDUSTRI</text>
+                <circle class="map-zone" data-zone="muara_hilir" cx="350" cy="200" r="35" fill="#78909c"/>
+                <text x="350" y="203" font-size="9" fill="#fff" font-weight="bold" text-anchor="middle">Muara Hilir</text>
+            </svg>`
+    },
+    {
+        id: 8,
+        tag: "Energi Terbarukan Topografi",
+        title: "Level 8: Potensi Pembangkit Angin (PLTB)",
+        instruction: "📍 Ketuk Pesisir Pantai Lepas Angin yang berhembus stabil tanpa hambatan topografi bukit!",
+        targetZone: "pesisir_lepas_angin",
+        targetName: "Pesisir Pantai Lepas Angin",
+        theory: "Kecepatan angin dipengaruhi oleh kekasaran permukaan (surface roughness). Area pesisir terbuka memiliki potensi kinetik angin yang stabil untuk konversi energi listrik PLTB.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <rect width="400" height="240" fill="#e1f5fe"/>
+                <path class="map-zone" data-zone="lembah_terapit" d="M 0,0 L 190,0 L 150,140 L 0,140 Z" fill="#a5d6a7"/>
+                <text x="80" y="70" font-size="10" fill="#1b5e20" font-weight="bold" text-anchor="middle">Lembah Bukit Terapit</text>
+                <path class="map-zone" data-zone="pesisir_lepas_angin" d="M 190,0 L 400,0 L 320,180 L 150,140 Z" fill="#fff59d" stroke="#f57f17" stroke-width="2"/>
+                <text x="260" y="80" font-size="11" fill="#e65100" font-weight="bold" text-anchor="middle">PESISIR LEPAS ANGIN (PLTB)</text>
+            </svg>`
+    },
+    {
+        id: 9,
+        tag: "Geografi Transportasi Logistik",
+        title: "Level 9: Koridor Tol Laut Hub Maritim",
+        instruction: "📍 Ketuk Pelabuhan Hub Timur Indonesia yang menjadi pusat pengumpul & distribusi kargo logistik!",
+        targetZone: "pelabuhan_hub_timur",
+        targetName: "Pelabuhan Hub Maritim Timur",
+        theory: "Efisiensi sistem logistik Tol Laut mengandalkan Pelabuhan Hub Utama (hub-and-spoke). Kepastian jadwal pelayaran kapal kargo menekan disparitas harga barang di wilayah timur.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <rect width="400" height="240" fill="#e0f7fa"/>
+                <circle class="map-zone" data-zone="feeder_barat" cx="70" cy="120" r="42" fill="#a5d6a7"/>
+                <text x="70" y="123" font-size="9" fill="#000" font-weight="bold" text-anchor="middle">Feeder Barat</text>
+                <circle class="map-zone" data-zone="pelabuhan_hub_timur" cx="200" cy="120" r="52" fill="#0288d1" stroke="#01579b" stroke-width="3"/>
+                <text x="200" y="115" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">HUB MARITIM TIMUR</text>
+                <text x="200" y="128" font-size="8" fill="#fff" font-weight="bold" text-anchor="middle">(DISTRIBUSI LOGISTIK)</text>
+                <circle class="map-zone" data-zone="feeder_utara" cx="330" cy="120" r="42" fill="#a5d6a7"/>
+                <text x="330" y="123" font-size="9" fill="#000" font-weight="bold" text-anchor="middle">Feeder Utara</text>
+            </svg>`
+    },
+    {
+        id: 10,
+        tag: "Hidrologi Hulu-Hilir DAS",
+        title: "Level 10: Konservasi Hulu Penahan Banjir",
+        instruction: "📍 Ketuk Hutan Resapan Hulu Pegunungan yang berfungsi menyerap air hujan penahan banjir hilir!",
+        targetZone: "hutan_resapan_hulu",
+        targetName: "Hutan Resapan Hulu Pegunungan",
+        theory: "Konsep hidrologi keterkaitan hulu-hilir (upstream-downstream continuum) menunjukkan bahwa hutan hulu berfungsi sebagai daerah infiltrasi. Tutupan vegetasi hulu menahan limpasan permukaan (run-off) penyebab banjir perkotaan hilir.",
+        renderMap: () => `
+            <svg viewBox="0 0 400 240" width="100%">
+                <rect width="400" height="240" fill="#f1f8e9"/>
+                <path class="map-zone" data-zone="hutan_resapan_hulu" d="M 0,0 L 400,0 L 400,105 L 0,105 Z" fill="#1b5e20" stroke="#003300" stroke-width="2"/>
+                <text x="200" y="55" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">HUTAN RESAPAN HULU PEGUNUNGAN</text>
+                <path class="map-zone" data-zone="pemukiman_hilir" d="M 0,140 L 400,140 L 400,240 L 0,240 Z" fill="#607d8b"/>
+                <text x="200" y="190" font-size="11" fill="#fff" font-weight="bold" text-anchor="middle">Pemukiman Perkotaan Hilir</text>
+                <path d="M 200,105 L 200,140" stroke="#0288d1" stroke-width="12"/>
+            </svg>`
+    }
+];
+
+function playSound(type) {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = new AudioCtx();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'correct') {
+            osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+            osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.12); // E5
+            osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.24); // G5
+            gain.gain.setValueAtTime(0.18, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.4);
+        } else {
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(220, ctx.currentTime); // A3
+            osc.frequency.setValueAtTime(146.83, ctx.currentTime + 0.15); // D3
+            gain.gain.setValueAtTime(0.18, ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+            osc.start();
+            osc.stop(ctx.currentTime + 0.4);
+        }
+    } catch(e) {}
+}
+
+function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+function startRegistration() {
+    const nameInput = document.getElementById('inputStudentName').value.trim();
+    const classInput = document.getElementById('inputStudentClass').value.trim();
+    
+    let valid = true;
+    if (!nameInput) {
+        document.getElementById('valName').style.display = 'block';
+        valid = false;
+    } else {
+        document.getElementById('valName').style.display = 'none';
+    }
+
+    if (!classInput) {
+        document.getElementById('valClass').style.display = 'block';
+        valid = false;
+    } else {
+        document.getElementById('valClass').style.display = 'none';
+    }
+
+    if (!valid) return;
+
+    studentName = nameInput;
+    studentClass = classInput;
+    currentLevelIndex = 0;
+    score = 0;
+    userRecords = [];
+
+    document.getElementById('hudStudentDisplay').innerText = `Siswa: ${studentName} | Kelas: ${studentClass}`;
+
+    showScreen('gameScreen');
+    loadLevel();
+}
+
+function loadLevel() {
+    selectedZone = null;
+    isAnswerChecked = false;
+    const lvl = mapLevels[currentLevelIndex];
+
+    document.getElementById('levelIndicator').innerText = `Level ${lvl.id} / 10`;
+    document.getElementById('currentScore').innerText = score;
+    document.getElementById('progressBar').style.width = `${((currentLevelIndex + 1) / 10) * 100}%`;
+
+    document.getElementById('levelTag').innerText = lvl.tag;
+    document.getElementById('levelTitle').innerText = lvl.title;
+    document.getElementById('promptInstruction').innerText = lvl.instruction;
+
+    const svgContainer = document.getElementById('svgContainer');
+    svgContainer.innerHTML = lvl.renderMap();
+
+    document.getElementById('pinContainer').innerHTML = '';
+    document.getElementById('feedbackBox').style.display = 'none';
+    document.getElementById('theoryCard').style.display = 'none';
+    
+    const checkBtn = document.getElementById('checkBtn');
+    checkBtn.style.display = 'flex';
+    checkBtn.disabled = true;
+
+    document.getElementById('nextBtn').style.display = 'none';
+
+    const mapWrapper = document.getElementById('mapBoardWrapper');
+    mapWrapper.onclick = (e) => handleMapTap(e, lvl);
+}
+
+function handleMapTap(e, lvl) {
+    if (isAnswerChecked) return;
+
+    const clickedZoneElem = e.target.closest('.map-zone');
+    if (!clickedZoneElem) return;
+
+    document.querySelectorAll('.map-zone').forEach(z => z.classList.remove('selected-zone'));
+
+    clickedZoneElem.classList.add('selected-zone');
+    selectedZone = clickedZoneElem.getAttribute('data-zone');
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const pinX = e.clientX - rect.left;
+    const pinY = e.clientY - rect.top;
+
+    dropPin(pinX, pinY);
+
+    document.getElementById('checkBtn').disabled = false;
+}
+
+function dropPin(x, y) {
+    const pinContainer = document.getElementById('pinContainer');
+    pinContainer.innerHTML = '';
+
+    const pin = document.createElement('div');
+    pin.className = 'pin-marker';
+    pin.style.left = `${x}px`;
+    pin.style.top = `${y}px`;
+    pin.innerHTML = `
+        <svg viewBox="0 0 24 24" width="30" height="30" fill="#d32f2f" stroke="#ffffff" stroke-width="1.8">
+            <path d="M12 2c-3.87 0-7 3.13-7 7 0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+            <circle cx="12" cy="9" r="2.5" fill="#ffffff"/>
+        </svg>
+    `;
+    pinContainer.appendChild(pin);
+}
+
+function checkAnswer() {
+    if (!selectedZone || isAnswerChecked) return;
+
+    isAnswerChecked = true;
+    const lvl = mapLevels[currentLevelIndex];
+    const isCorrect = selectedZone === lvl.targetZone;
+
+    const targetElem = document.querySelector(`[data-zone="${lvl.targetZone}"]`);
+    if (targetElem) {
+        targetElem.classList.add('correct-zone-glow');
+    }
+
+    if (!isCorrect) {
+        const wrongElem = document.querySelector(`[data-zone="${selectedZone}"]`);
+        if (wrongElem) wrongElem.classList.add('wrong-zone-glow');
+    }
+
+    const feedbackBox = document.getElementById('feedbackBox');
+    const feedbackStatus = document.getElementById('feedbackStatus');
+    const feedbackText = document.getElementById('feedbackText');
+
+    if (isCorrect) {
+        score += 10;
+        playSound('correct');
+        feedbackBox.className = "feedback-box correct";
+        feedbackStatus.innerHTML = `✅ Penetapan Titik Tepat! (+10 Poin)`;
+        feedbackText.innerHTML = `Luar biasa! Anda berhasil mengidentifikasi <strong>${lvl.targetName}</strong> dengan tepat.`;
+    } else {
+        playSound('wrong');
+        feedbackBox.className = "feedback-box wrong";
+        feedbackStatus.innerHTML = `❌ Penetapan Belum Tepat`;
+        feedbackText.innerHTML = `Titik lokasi yang tepat adalah pada zona <strong>${lvl.targetName}</strong>.`;
+    }
+
+    userRecords.push({
+        id: lvl.id,
+        title: lvl.title,
+        isCorrect: isCorrect,
+        targetName: lvl.targetName,
+        theory: lvl.theory
+    });
+
+    document.getElementById('currentScore').innerText = score;
+    feedbackBox.style.display = 'block';
+
+    document.getElementById('theoryBody').innerText = lvl.theory;
+    document.getElementById('theoryCard').style.display = 'block';
+
+    document.getElementById('checkBtn').style.display = 'none';
+    
+    const nextBtn = document.getElementById('nextBtn');
+    if (currentLevelIndex === mapLevels.length - 1) {
+        nextBtn.innerText = "Lihat Hasil Akhir & Evaluasi";
+    } else {
+        nextBtn.innerText = "Lanjut ke Level Berikutnya";
+    }
+    nextBtn.style.display = 'flex';
+}
+
+function nextLevel() {
+    currentLevelIndex++;
+    if (currentLevelIndex < mapLevels.length) {
+        loadLevel();
+    } else {
+        renderResults();
+    }
+}
+
+function renderResults() {
+    showScreen('resultScreen');
+    document.getElementById('finalScore').innerText = score;
+    document.getElementById('resultGreeting').innerText = `Selamat ${studentName}!`;
+
+    const headerBox = document.getElementById('resultHeaderBox');
+    const badgeElem = document.getElementById('resultBadge');
+    const msgElem = document.getElementById('resultMessage');
+
+    if (score >= 80) {
+        headerBox.className = "result-box passed";
+        badgeElem.innerText = "🏆 SANGAT BAIK / TUNTAS";
+        msgElem.innerHTML = `Selamat <strong>${studentName}</strong> dari kelas <strong>${studentClass}</strong>! Anda berhasil mencapai skor <strong>${score}</strong> (Target minimal: 80). Analisis keruangan dan pemahaman teori IPAS Anda sangat luar biasa!`;
+    } else {
+        headerBox.className = "result-box failed";
+        badgeElem.innerText = "⚠️ BELUM TUNTAS (NILAI < 80)";
+        msgElem.innerHTML = `Halo <strong>${studentName}</strong> dari kelas <strong>${studentClass}</strong>. Nilai Anda adalah <strong>${score}</strong> dan belum mencapai target minimum 80. Silakan pelajari kembali ulasan materi di bawah ini dan klik <strong>Ulangi Permainan</strong> untuk mencoba lagi!`;
+    }
+
+    const accordionContainer = document.getElementById('accordionContainer');
+    accordionContainer.innerHTML = '';
+
+    userRecords.forEach((rec) => {
+        const item = document.createElement('div');
+        item.className = 'accordion-item';
+        const badge = rec.isCorrect 
+            ? `<span style="color: var(--correct-text); font-weight: bold;">[Benar +10]</span>` 
+            : `<span style="color: var(--wrong-text); font-weight: bold;">[Salah +0]</span>`;
+
+        item.innerHTML = `
+            <div class="accordion-header" onclick="toggleAccordion(this)">
+                <span>${rec.title} ${badge}</span>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </div>
+            <div class="accordion-body">
+                <strong>Lokasi Tepat:</strong> ${rec.targetName}<br><br>
+                <strong>Ulasan Teori IPAS:</strong><br>${rec.theory}
+            </div>
+        `;
+        accordionContainer.appendChild(item);
+    });
+}
+
+function toggleAccordion(header) {
+    header.parentElement.classList.toggle('open');
+}
+
+function restartGame() {
+    document.getElementById('inputStudentName').value = studentName;
+    document.getElementById('inputStudentClass').value = studentClass;
+    showScreen('welcomeScreen');
+}
+</script>
+</body>
+</html>
